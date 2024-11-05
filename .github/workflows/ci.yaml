@@ -1,36 +1,48 @@
-name:  First Github Actions
+name: First Github Actions
 
 on:
-   push
+  push:
+    branches:
+      - master  # Specify branch if needed, or remove for all branches
+
 jobs:
   build_job_1:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: install cowsay 
-      uses: sudo apt-get install cowsay -y
+      - name: Install cowsay
+        run: sudo apt-get install -y cowsay
 
-    - name: Execute Cowsay CMD 
-      uses: cowsay -f dragon "Run for a cover, I am a DRAGON....ROWR" >> dragon.txt
+      - name: Execute Cowsay CMD
+        run: cowsay -f dragon "Run for cover, I am a DRAGON....ROWR" > dragon.txt
 
-    - name: sleep for 30 seconds
-      uses: sleep 30 seconds
-  test_jobs:
+      - name: Sleep for 30 seconds
+        run: sleep 30
+
+  test_job:
     runs-on: ubuntu-latest
+    needs: build_job_1  # Ensures this job runs after build_job_1
     steps:
-    - name: Sleep for 10 seconds
-      run: sleep 10
-    - name: test file exists
-      run: grep -i "dragon" dragon.txt
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sleep for 10 seconds
+        run: sleep 10
+
+      - name: Test file exists
+        run: grep -i "dragon" dragon.txt
+
   deploy_job:
     runs-on: ubuntu-latest
+    needs: test_job  # Ensures this job runs after test_job
     steps:
-    - name: Read File
-      run: cat dragon.txt
-      
-    - name: Deploy
-      run: echo Deploying....  
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      
+      - name: Read File
+        run: cat dragon.txt
+
+      - name: Deploy
+        run: echo "Deploying...."
