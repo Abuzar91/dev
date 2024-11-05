@@ -21,12 +21,23 @@ jobs:
       - name: Sleep for 30 seconds
         run: sleep 30
 
+      - name: Upload dragon.txt as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dragon-file
+          path: dragon.txt
+
   test_job:
     runs-on: ubuntu-latest
-    needs: build_job_1  # Ensures this job runs after build_job_1
+    needs: build_job_1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Download dragon.txt artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dragon-file
 
       - name: Sleep for 10 seconds
         run: sleep 10
@@ -36,10 +47,15 @@ jobs:
 
   deploy_job:
     runs-on: ubuntu-latest
-    needs: test_job  # Ensures this job runs after test_job
+    needs: test_job
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Download dragon.txt artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dragon-file
 
       - name: Read File
         run: cat dragon.txt
